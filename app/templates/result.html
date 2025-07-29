@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Result - Fake News Detector</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .chart-box {
+            width: 60%;
+            margin: auto;
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .explanation-box {
+            background: rgba(255,255,255,0.1);
+            width: 60%;
+            margin: auto;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: left;
+        }
+        ul li {
+            font-size: 18px;
+            padding: 5px 0;
+        }
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            color: white;
+            background-color: #007BFF;
+            border-radius: 8px;
+            text-decoration: none;
+        }
+        a:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay"></div>
+    <div class="container">
+        <h2 class="title">Prediction: {{ '🛑 Fake News' if prediction==1 else '✅ Real News' }}</h2>
+        <p class="subtitle">Model Confidence:</p>
+
+        <div class="chart-box">
+            <canvas id="confidenceChart"></canvas>
+        </div>
+
+        <script>
+            const ctx = document.getElementById('confidenceChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Real News', 'Fake News'],
+                    datasets: [{
+                        label: 'Prediction Confidence',
+                        data: [{{ 100 - confidence }}, {{ confidence }}],
+                        backgroundColor: ['green', 'red']
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: '% Confidence'
+                            }
+                        }
+                    }
+                }
+            });
+        </script>
+
+    <h3>Why this prediction?</h3>
+    <div class="explanation-box">
+        <ul>
+            {% for word, weight in explanation %}
+            <li><strong>{{ word }}</strong> → influence: {{ '%.3f'|format(weight) }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <a href="/">🔄 Check Another News</a>
+</body>
+</html>
